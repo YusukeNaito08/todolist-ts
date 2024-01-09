@@ -1,15 +1,16 @@
 import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import "./App.css";
+
+type Todo = {
+  inputValue: string;
+  id: string;
+  checked: boolean;
+};
 
 function App() {
   const [todo, setTodo] = useState("");
   const [todoList, setTodoList] = useState<Todo[]>([]);
-
-  type Todo = {
-    inputValue: string;
-    id: number;
-    checked: boolean;
-  };
 
   const addTodoTxt = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -17,24 +18,24 @@ function App() {
     if (todo.trim() !== "") {
       const newTodo: Todo = {
         inputValue: todo,
-        id: Date.now(),
+        id: uuidv4(),
         checked: false,
       };
       setTodoList([...todoList, newTodo]);
       setTodo("");
     }
   };
-  const compTodo = (todoId: number, todoChecked: boolean) => {
+  const compTodo = (todoId: string, todoChecked: boolean) => {
     const updateTodo = todoList.map((todo) => {
       if (todo.id === todoId) {
-        todo.checked = !todoChecked;
+        return { ...todo, checked: !todoChecked };
       }
       return todo;
     });
     setTodoList(updateTodo);
   };
 
-  const delTodo = (todoId: number) => {
+  const delTodo = (todoId: string) => {
     const deleteTodo = todoList.filter((todo) => todo.id !== todoId);
     setTodoList(deleteTodo);
   };
@@ -49,7 +50,7 @@ function App() {
       <ul>
         {todoList.map((todo) => {
           return (
-            <li key={todo.id}>
+            <li key={todo.id} id={todo.id}>
               <span
                 style={{
                   textDecoration: todo.checked ? "line-through" : "none",
@@ -59,7 +60,7 @@ function App() {
               </span>
               <input type="checkbox" onClick={() => compTodo(todo.id, todo.checked)} />
               完了
-              <input type="checkbox" onClick={() => delTodo(todo.id)} />
+              <input type="button" onClick={() => delTodo(todo.id)} />
               削除
             </li>
           );
